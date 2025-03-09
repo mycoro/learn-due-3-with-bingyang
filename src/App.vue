@@ -1,5 +1,5 @@
 <template>
-  <BlogPost v-for="post in posts" :key="post.id" v-bind="post" @delete-blog-post="processDeletion"></BlogPost>
+  <BlogPost v-for="post in posts" :key="post.id" :id="post.id" v-model:blogPostTitle="post.blogPostTitle" v-model:blogPostContent="post.blogPostContent" @delete-blog-post="processDeletion"></BlogPost>
 </template>
 
 <script setup>
