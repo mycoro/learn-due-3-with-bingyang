@@ -5,7 +5,11 @@
         </aside>
         <main class="blog-post-content-with-sidebar">
             <!-- This is the default router-view -->
-            <router-view class="blog-post-content"></router-view>
+            <router-view class="blog-post-content" v-slot="{ Component, route }">
+                <transition mode="out-in" enter-active-class="animate__animated animate__rotateInDownLeft animate__faster" leave-active-class="animate__animated animate__rotateOutUpRight animate_faster">
+                    <component :is="Component" :key="route.path"></component>
+                </transition>
+            </router-view>
             <!-- This is the named router-view -->
             <router-view name="sidebar"></router-view>
         </main>
@@ -34,5 +38,4 @@ import BlogPostList from '@/components/BlogPostList.vue';
         flex: 1; //take up the remaining space
     }
 }
-
 </style>

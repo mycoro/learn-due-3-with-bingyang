@@ -21,6 +21,7 @@ const router = createRouter({
         {path: '/', name: 'mainLayout', component: MainLayout, children: [
             {path: '/home', name: 'home', component: Home, meta: {requiresAuth: false} },
             {path:'/blogPosts', name: 'blogPosts', component: BlogPosts, 
+            meta: { enterAnimation: 'animate__animated animate__bounceIn', leaveAnimation: 'animate__animated animate__bounceOut'},
             redirect: {name: 'blogPostsGreeting'},
             children: [
             {path: '', name: 'blogPostsGreeting',component: BlogPostsGreeting, meta: {requiresAuth: false} },
