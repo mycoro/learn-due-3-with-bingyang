@@ -1,15 +1,7 @@
 import { createRouter, createWebHistory} from 'vue-router'
 
-//import components
-import Home from '@/views/Home.vue'
-import BlogPosts from '@/views/BlogPosts.vue'
-import About from '@/views/About.vue'
-import BlogPost from '@/views/BlogPost.vue'
-import BlogPostsGreeting from '@/views/BlogPostsGreeting.vue'
-import NotFound from '@/views/NotFound.vue'
-import Ads from '@/views/Ads.vue'
-import Login from '@/views/Login.vue'
-import MainLayout from '@/views/MainLayout.vue'
+//no need to import the components here, they will be lazy-loaded
+
 import { isAuthenticated } from '@/apis/auth'
 
 //create a router instance
@@ -31,19 +23,19 @@ const router = createRouter({
     },
     //define some routes, each route record should map to a component
     routes: [
-        {path: '/', name: 'mainLayout', component: MainLayout, children: [
-            {path: '/home', name: 'home', component: Home, meta: {requiresAuth: false} },
-            {path:'/blogPosts', name: 'blogPosts', component: BlogPosts, 
+        {path: '/', name: 'mainLayout', component: () => import('@/views/MainLayout.vue'), children: [
+            {path: '/home', name: 'home', component: () => import('@/views/Home.vue'), meta: {requiresAuth: false} },
+            {path:'/blogPosts', name: 'blogPosts', component: () => import('@/views/BlogPosts.vue'), 
             meta: { enterAnimation: 'animate__animated animate__bounceIn', leaveAnimation: 'animate__animated animate__bounceOut'},
             redirect: {name: 'blogPostsGreeting'},
             children: [
-            {path: '', name: 'blogPostsGreeting',component: BlogPostsGreeting, meta: {requiresAuth: false} },
-            {path: '/blogPosts/:id(\\d+)', name:'blogPost', components: { default: BlogPost, sidebar: Ads}, meta: {requiresAuth: true, scrollToElement: '.blog-post-layout'}}
+            {path: '', name: 'blogPostsGreeting',component: () => import('@/views/BlogPostsGreeting.vue'), meta: {requiresAuth: false} },
+            {path: '/blogPosts/:id(\\d+)', name:'blogPost', components: { default: () => import('@/views/BlogPost.vue'), sidebar: () => import('@/views/Ads.vue')}, meta: {requiresAuth: true, scrollToElement: '.blog-post-layout'}}
         ]},
-        {path: '/about', name: 'about', component: About, meta: {requiresAuth: false}},
+        {path: '/about', name: 'about', component: () => import('@/views/About.vue'), meta: {requiresAuth: false}},
         ]},
-        { path: '/login', name: 'login', component: Login, meta: {requiresAuth: false}},
-        {path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound, meta: {requiresAuth: false}}, //match any path that hasn't been matched
+        { path: '/login', name: 'login', component: () => import('@/views/Login.vue'), meta: {requiresAuth: false}},
+        {path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFound.vue'), meta: {requiresAuth: false}}, //match any path that hasn't been matched
     ],
 })
 
