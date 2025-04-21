@@ -17,11 +17,15 @@
 
 <script setup>
 import { ref } from 'vue'
-import { login } from '@/apis/auth'
+import { login, getUserRole } from '@/apis/auth'
 import { useRouter, useRoute } from 'vue-router'
+import { vipRoute } from '@/router/dynamicRoutes'
+import { useNavStore } from '@/stores/navStore'
 
 const router = useRouter()
 const route = useRoute()
+
+const { updateNavRoutes } = useNavStore()
     
 const username = ref('')
 const password = ref('')
@@ -29,6 +33,14 @@ const password = ref('')
 async function handleLogin() {
     try {
         await login(username.value, password.value)
+
+        const userRole = getUserRole()
+
+        //dynamically add VIP route if the user is a VIP and route is not already added
+        if(userRole === 'vip' && !router.hasRoute('vipExclusive')) {
+            router.addRoute('mainLayout', vipRoute)
+            updateNavRoutes() //update navigation store to reflect the new routes
+        }
 
         //redirect to the page the user originally wanted to visit, or fallback to home
         const redirectPath = route.query.redirect || { name: 'home' }

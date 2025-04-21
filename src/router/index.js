@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory} from 'vue-router'
 
 //no need to import the components here, they will be lazy-loaded
-
-import { isAuthenticated } from '@/apis/auth'
+import { getUserRole, isAuthenticated } from '@/apis/auth'
 
 //create a router instance
 const router = createRouter({
@@ -24,15 +23,15 @@ const router = createRouter({
     //define some routes, each route record should map to a component
     routes: [
         {path: '/', name: 'mainLayout', component: () => import('@/views/MainLayout.vue'), children: [
-            {path: '/home', name: 'home', component: () => import('@/views/Home.vue'), meta: {requiresAuth: false} },
+            {path: '/home', name: 'home', component: () => import('@/views/Home.vue'), meta: {requiresAuth: false, title: 'Home', isNavLink: true} },
             {path:'/blogPosts', name: 'blogPosts', component: () => import('@/views/BlogPosts.vue'), 
-            meta: { enterAnimation: 'animate__animated animate__bounceIn', leaveAnimation: 'animate__animated animate__bounceOut'},
+            meta: { title:'Blog Posts', isNavLink: true, enterAnimation: 'animate__animated animate__bounceIn', leaveAnimation: 'animate__animated animate__bounceOut'},
             redirect: {name: 'blogPostsGreeting'},
             children: [
             {path: '', name: 'blogPostsGreeting',component: () => import('@/views/BlogPostsGreeting.vue'), meta: {requiresAuth: false} },
             {path: '/blogPosts/:id(\\d+)', name:'blogPost', components: { default: () => import('@/views/BlogPost.vue'), sidebar: () => import('@/views/Ads.vue')}, meta: {requiresAuth: true, scrollToElement: '.blog-post-layout'}}
         ]},
-        {path: '/about', name: 'about', component: () => import('@/views/About.vue'), meta: {requiresAuth: false}},
+        {path: '/about', name: 'about', component: () => import('@/views/About.vue'), meta: {requiresAuth: false, title: 'About', isNavLink: true}},
         ]},
         { path: '/login', name: 'login', component: () => import('@/views/Login.vue'), meta: {requiresAuth: false}},
         {path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFound.vue'), meta: {requiresAuth: false}}, //match any path that hasn't been matched
@@ -45,6 +44,12 @@ router.beforeEach((to, from) => {
     if(to.meta.requiresAuth && !isAuthenticated.value) {
         //redirect to the login page with the orginally requested route
         return {name: 'login', query: { redirect: to.fullPath  }}
+    }
+
+    const userRole = getUserRole()
+    //check role based access
+    if(to.meta.roles && !to.meta.roles.includes(userRole)) {
+        return { name: 'home'} //redirect to the home page
     }
 })
 
